@@ -149,11 +149,15 @@ class discrete_BCQ(object):
 		# Optimize the Q
 		self.Q_optimizer.zero_grad()
 		Q_loss.backward()
+		clip=1
+		torch.nn.utils.clip_grad_norm_(self.Q.parameters(), clip)
 		self.Q_optimizer.step()
 
 		# Update target network by polyak or full copy every X iterations.
 		self.iterations += 1
 		self.maybe_update_target()
+		
+		return Q_loss.item()
 
 
 	def polyak_target_update(self):
